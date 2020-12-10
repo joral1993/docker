@@ -1,0 +1,40 @@
+version: '2'
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    volumes:
+      - /opt/mysql/data:/var/lib/mysql
+      - /opt/mysql/conf:/etc/my.cnf
+      - /opt/mysql/logs:/logs
+      - /opt/mysql/init:/docker-entrypoint-initdb.d/
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    privileged: true
+    ports:
+      - "3306:3306"
+
+  redis:
+    container_name: redis
+    image: redis:5.0.3
+    volumes:
+      - /opt/redis/data:/data
+      - /opt/redis/conf:/etc/redis
+    ports:
+      - "6379:6379"
+
+  server:
+    container_name: joral
+    image: joral/app
+    depends_on:
+      - mysql
+    environment:
+      IP: "192.168.10.20"
+      PORT: "3306"
+      DRIVERCLASSNAME: "com.mysql.jdbc.Driver"
+      DBNAME: "lottery"
+      URL: "jdbc:mysql://192.168.99.100:3306/lottery?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull"
+      USERNAME: "root"
+      PASSWORD: "123456"
+    ports:
+      - "8080:8080"
